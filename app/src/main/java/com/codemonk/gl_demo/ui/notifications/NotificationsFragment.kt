@@ -1,64 +1,48 @@
 package com.codemonk.gl_demo.ui.notifications
 
-import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.CameraX
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.codemonk.gl_demo.R
+import com.codemonk.gl_demo.opengl.TextureSurfaceRenderer
+import com.codemonk.gl_demo.opengl.renderer.TextureRenderer
+import com.codemonk.gl_demo.usslib.CSVReader
+import com.codemonk.gl_demo.usslib.SignalProcessor
+import com.codemonk.gl_demo.utils.rawResToInputStream
+import com.codemonk.gl_demo.utils.rawResToString
+import timber.log.Timber
+import java.io.InputStream
 
-class NotificationsFragment : Fragment(), TextureView.SurfaceTextureListener {
+class NotificationsFragment : Fragment() {
 
+    private lateinit var glView: TextureSurfaceRenderer
     private lateinit var notificationsViewModel: NotificationsViewModel
-    private lateinit var textureView: TextureView
-    private lateinit var mSurfaceTexture: SurfaceTexture
-    private lateinit var mCamera: CameraX
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        textureView = TextureView(requireContext())
-        textureView.surfaceTextureListener = this
+        notificationsViewModel = ViewModelProvider(this).get(NotificationsViewModel::class.java)
 
-        return textureView
+        glView = TextureSurfaceRenderer(context)
+        glView.setRenderer(TextureRenderer(context))
+
+        loadRFSignals()
+        return glView
     }
 
-    override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
-        TODO("Not yet implemented")
-    }
+    fun loadRFSignals() {
+        val inputStream: InputStream = requireContext().rawResToInputStream(R.raw.single_rf_data)
+        Timber.d("InputStream : ${inputStream.bufferedReader(Charsets.UTF_8).toString()}")
+        var rfSignals = CSVReader(inputStream).read()
+        var signalProcessor = SignalProcessor()
+        var hilbertMat = signalProcessor.hilbert2DTransform(rfSignals.toTypedArray())
+        Timber.d("hilbertMat: $hilbertMat")
 
-    override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
-        TODO("Not yet implemented")
-    }
-
-    fun startPreview() {
-        val cameraProviderFeature = ProcessCameraProvider.getInstance(requireContext())
-    }
-
-    fun bindCameraPreview(cameraProvider: ProcessCameraProvider) {
-        val preview = Preview.Builder().build()
-
-        val cameraSelector: CameraSelector = CameraSelector.Builder()
-            .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-            .build()
-
-
-//        preview.(textureView.surfaceTexture)
     }
 
 

@@ -17,4 +17,5 @@ class MyGLSurfaceView(context: Context?) : GLSurfaceView(context) {
 
         setRenderer(renderer)
     }
+
 }

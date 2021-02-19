@@ -14,7 +14,7 @@ var triangleCoords = floatArrayOf(     // in counterclockwise order:
 )
 
 class Triangle {
-    val color: FloatArray = floatArrayOf(0.63671875f, 0.76953125f, 0.22265625f, 1.0f)
+    private val color: FloatArray = floatArrayOf(0.5f, 0.5f, 0.5f, 1.0f)
 
     private val vertexShaderCode =
         "attribute vec4 vPosition;" +
