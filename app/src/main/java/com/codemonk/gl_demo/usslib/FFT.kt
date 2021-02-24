@@ -1,11 +1,11 @@
 package com.codemonk.gl_demo.usslib
 
 import org.apache.commons.math3.complex.Complex
-import kotlin.math.sign
+import org.apache.commons.math3.transform.FastFourierTransformer
 
 class FFT(private var signal: DoubleArray) {
 
-    private var output: DoubleArray = doubleArrayOf()
+    private var output: ArrayList<Complex> = ArrayList()
 
     companion object {
         fun fft(signal: DoubleArray): ArrayList<Complex> {
